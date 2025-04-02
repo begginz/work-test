@@ -1,0 +1,4 @@
+zero_shot|Hi there my name is Bob, this leaps Sesame and Zonos because the output is more natural than both, imo, Except Sesame's hosted demo, maybe
+few_shot|Man, the way social media has, um, completely changed how we interact is just wild, right? Like, we're all connected 24/7 but somehow people feel more alone than ever. And don't even get me started on how it's messing with kids' self-esteem and mental health and whatnot.
+emotion_tts_0|The flesh on my body <giggle> is to hide my bursting charm. Otherwise, wouldn't it scare you?
+emotion_tts_1|<sigh> You scared me! <cry>

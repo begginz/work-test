@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            max-width: 150px; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        audio {
+            width: 100%;
+            display: none;
+            /* 隐藏音频控件，仅通过按钮播放 */
+        }
+
+        button {
+            padding: 12px 24px;
+            /* 增大内边距 */
+            font-size: 18px;
+            /* 增大字体大小 */
+        }
+
+        h1 {
+            text-align: center; /* 新增样式，让 h1 标题文本居中 */
+        }
+    </style>
+
+    <script>
+        const xhr = new XMLHttpRequest();
+        // 打开文件
+        xhr.open('GET', 'data/index.txt', true);
+        // 监听状态变化
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // 获取文件内容
+                const lines = xhr.responseText.split('\n');
+                const tableBody = document.getElementById('table-body');
+
+                // 这里我们需要使用 fetch 来获取文件夹列表
+                fetch('data')
+                   .then(response => response.text())
+                   .then(data => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(data, 'text/html');
+                        const folders = [];
+                        const links = doc.querySelectorAll('a');
+                        links.forEach(link => {
+                            const href = link.getAttribute('href');
+                            if (href.endsWith('/') && href!== 'sample_wav/') {
+                                folders.push(href.slice(0, -1));
+                            }
+                        });
+
+                        const folderMap = {
+                            3: 'data/sample_wav',
+                        };
+
+                        folders.forEach((folder, index) => {
+                            folderMap[index + 7] = `data/${folder}`;
+                        });
+
+                        const getAudioSrc = (column, audioName) => {
+                            return `${folderMap[column]}/${audioName}`;
+                        };
+
+                        const headerRow = document.createElement('tr');
+                        const cell1 = document.createElement('th');
+                        cell1.textContent = 'wav_name';
+                        cell1.title = 'wav_name'; // 添加 title 属性
+                        headerRow.appendChild(cell1);
+                        const cell2 = document.createElement('th');
+                        cell2.textContent = 'description';
+                        cell2.title = 'description'; // 添加 title 属性
+                        headerRow.appendChild(cell2);
+                        const cell3 = document.createElement('th');
+                        cell3.textContent = 'sample_wav';
+                        cell3.title = 'sample_wav'; // 添加 title 属性
+                        headerRow.appendChild(cell3);
+                        const cell4 = document.createElement('th');
+                        cell4.textContent = 'score';
+                        cell4.title = 'score'; // 添加 title 属性
+                        headerRow.appendChild(cell4);
+                        const cell5 = document.createElement('th');
+                        cell5.textContent = 'wer';
+                        cell5.title = 'wer'; // 添加 title 属性
+                        headerRow.appendChild(cell5);
+                        const cell6 = document.createElement('th');
+                        cell6.textContent = 'nmos';
+                        cell6.title = 'nmos'; // 添加 title 属性
+                        headerRow.appendChild(cell6);
+
+                        const folderHeaders = [];
+
+                        const getFolderHeader = (folder) => {
+                            return new Promise((resolve) => {
+                                const xhrHeader = new XMLHttpRequest();
+                                xhrHeader.open('GET', `data/${folder}/text.txt`, true);
+                                xhrHeader.onreadystatechange = function () {
+                                    if (xhrHeader.readyState === 4 && xhrHeader.status === 200) {
+                                        resolve(xhrHeader.responseText.trim());
+                                    }
+                                };
+                                xhrHeader.send();
+                            });
+                        };
+
+                        const promises = folders.map(folder => getFolderHeader(folder));
+
+                        Promise.all(promises).then(headers => {
+                            headers.forEach(header => {
+                                const cell = document.createElement('th');
+                                cell.textContent = header;
+                                cell.title = header; // 添加 title 属性
+                                headerRow.appendChild(cell);
+                            });
+
+                            tableBody.appendChild(headerRow);
+
+                            // 遍历每一行
+                            lines.forEach(line => {
+                                const row = document.createElement('tr');
+                                const parts = line.split(',');
+
+                                // 第一列
+                                const cell1 = document.createElement('td');
+                                cell1.textContent = parts[0] || '';
+                                cell1.title = parts[0] || ''; // 添加 title 属性
+                                row.appendChild(cell1);
+
+                                // 第二列
+                                const cell2 = document.createElement('td');
+                                cell2.textContent = parts[1] || '';
+                                cell2.title = parts[1] || ''; // 添加 title 属性
+                                row.appendChild(cell2);
+
+                                // 第三列
+                                const cell3 = document.createElement('td');
+                                const audioSrc3 = getAudioSrc(3, parts[0]);
+                                let audio3 = document.createElement('audio');
+                                audio3.src = audioSrc3;
+                                audio3.controls = false;
+                                let playButton3 = document.createElement('button');
+                                playButton3.textContent = '播放';
+                                playButton3.style.display = 'none';
+                                playButton3.onclick = function () {
+                                    if (playingAudio) {
+                                        playingAudio.pause();
+                                        playingAudio.currentTime = 0;
+                                        if (playingAudio == audio3) {
+                                            playingAudio = null;
+                                            return;
+                                        }
+                                        playingAudio = null;
+                                    }
+                                    playingAudio = audio3;
+                                    audio3.play();
+                                };
+                                audio3.oncanplaythrough = function () {
+                                    playButton3.style.display = 'block';
+                                };
+                                cell3.appendChild(playButton3);
+                                cell3.appendChild(audio3);
+                                row.appendChild(cell3);
+
+                                // 第四列
+                                const cell4 = document.createElement('td');
+                                cell4.textContent = parts[2] || '';
+                                cell4.title = parts[2] || ''; // 添加 title 属性
+                                row.appendChild(cell4);
+
+                                // 第五列
+                                const cell5 = document.createElement('td');
+                                cell5.textContent = parts[3] || '';
+                                cell5.title = parts[3] || ''; // 添加 title 属性
+                                row.appendChild(cell5);
+
+                                // 第六列
+                                const cell6 = document.createElement('td');
+                                cell6.textContent = parts[parts.length - 1] || '';
+                                cell6.title = parts[parts.length - 1] || ''; // 添加 title 属性
+                                row.appendChild(cell6);
+
+                                // 创建剩余列
+                                for (let i = 0; i < folders.length; i++) {
+                                    const cell = document.createElement('td');
+                                    const audioSrc = getAudioSrc(i + 7, parts[0]);
+                                    let audio = document.createElement('audio');
+                                    audio.src = audioSrc;
+                                    audio.controls = false;
+                                    let playButton = document.createElement('button');
+                                    playButton.textContent = '播放';
+                                    playButton.style.display = 'none';
+                                    playButton.onclick = function () {
+                                        if (playingAudio) {
+                                            playingAudio.pause();
+                                            playingAudio.currentTime = 0;
+                                            if (playingAudio == audio) {
+                                                playingAudio = null;
+                                                return;
+                                            }
+                                            playingAudio = null;
+                                        }
+                                        playingAudio = audio;
+                                        audio.play();
+                                    };
+                                    audio.oncanplaythrough = function () {
+                                        playButton.style.display = 'block';
+                                    };
+                                    cell.appendChild(playButton);
+                                    cell.appendChild(audio);
+                                    row.appendChild(cell);
+                                }
+
+                                tableBody.appendChild(row);
+                            });
+                        });
+                    });
+            }
+        };
+        // 发送请求
+        xhr.send();
+
+        let playingAudio;
+        function playAudio(audioSrc) {
+            if (playingAudio) {
+                playingAudio.pause();
+                playingAudio.currentTime = 0;
+                if (playingAudio.src === audioSrc) {
+                    playingAudio = null;
+                    return;
+                }
+            }
+            playingAudio = new Audio(audioSrc);
+            playingAudio.play();
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Orpheus-TTS</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>mode</th>
+                <th colspan="2">input</th>
+                <th>gen_wav</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>zero_shot_female</td>
+                <td>
+                    <button onclick="playAudio('data/4022654511881686103.wav')">播放</button>
+                </td>
+                <td rowspan="2" title="Hi there my name is Bob, this leaps Sesame and Zonos because the output is more natural than both, imo, Except Sesame's hosted demo, maybe">Hi there my name is Bob, this leaps Sesame and Zonos because the output is more natural than both, imo, Except Sesame's hosted demo, maybe</td>
+                <td>
+                    <button onclick="playAudio('data/4022654511881686103_0.wav')">播放</button>
+                </td>
+            </tr>
+            <tr>
+                <td>zero_shot_male</td>
+                <td>
+                    <button onclick="playAudio('data/7098819224143199853.wav')">播放</button>
+                </td>
+                <td>
+                    <button onclick="playAudio('data/7098819224143199853_0.wav')">播放</button>
+                </td>
+            </tr>
+            <tr>
+                <td>few_shot</td>
+                <td colspan="2" title="Man, the way social media has, um, completely changed how we interact is just wild, right? Like, we're all connected 24/7 but somehow people feel more alone than ever. And don't even get me started on how it's messing with kids' self-esteem and mental health and whatnot.">Man, the way social media has, um, completely changed how we interact is just wild, right? Like, we're all connected 24/7 but somehow people feel more alone than ever. And don't even get me started on how it's messing with kids' self-esteem and mental health and whatnot.</td>
+                <td>
+                    <button onclick="playAudio('data/output.wav')">播放</button>
+                </td>
+            </tr>
+            <tr>
+                <td>emotion_zero_shot_0</td>
+                <td colspan="2" title="The flesh on my body <giggle> is to hide my bursting charm. Otherwise, wouldn't it scare you?">The flesh on my body &lt;giggle&gt; is to hide my bursting charm. Otherwise, wouldn't it scare you?</td>
+                <td>
+                    <button onclick="playAudio('data/4022654511881686103_1.wav')">播放</button>
+                    <button onclick="playAudio('data/7098819224143199853_1.wav')">播放</button>
+                </td>
+            </tr>
+            <tr>
+                <td>emotion_zero_shot_1</td>
+                <td colspan="2" title="<sigh> You scared me! <cry>">&lt;sigh&gt; You scared me! &lt;cry&gt;</td>
+                <td>
+                    <button onclick="playAudio('data/4022654511881686103_2.wav')">播放</button>
+                    <button onclick="playAudio('data/7098819224143199853_2.wav')">播放</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>
