@@ -41,7 +41,7 @@
         }
 
         h1 {
-            text-align: center; /* 新增样式，让 h1 标题文本居中 */
+            text-align: center; /* 让 h1 标题文本居中 */
         }
     </style>
 
@@ -262,14 +262,14 @@
     <table>
         <thead>
             <tr>
-                <th>mode</th>
+                <th colspan="2">mode</th>
                 <th colspan="2">input</th>
                 <th>gen_wav</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>zero_shot_female</td>
+                <td colspan="2">zero_shot_female</td>
                 <td>
                     <button onclick="playAudio('data/4022654511881686103.wav')">播放</button>
                 </td>
@@ -279,7 +279,7 @@
                 </td>
             </tr>
             <tr>
-                <td>zero_shot_male</td>
+                <td colspan="2">zero_shot_male</td>
                 <td>
                     <button onclick="playAudio('data/7098819224143199853.wav')">播放</button>
                 </td>
@@ -288,13 +288,14 @@
                 </td>
             </tr>
             <tr>
-                <td>few_shot</td>
+                <td colspan="2">few_shot</td>
                 <td colspan="2" title="Man, the way social media has, um, completely changed how we interact is just wild, right? Like, we're all connected 24/7 but somehow people feel more alone than ever. And don't even get me started on how it's messing with kids' self-esteem and mental health and whatnot.">Man, the way social media has, um, completely changed how we interact is just wild, right? Like, we're all connected 24/7 but somehow people feel more alone than ever. And don't even get me started on how it's messing with kids' self-esteem and mental health and whatnot.</td>
                 <td>
                     <button onclick="playAudio('data/output.wav')">播放</button>
                 </td>
             </tr>
             <tr>
+                <td rowspan="2">first_gen</td>
                 <td>emotion_zero_shot_0</td>
                 <td colspan="2" title="The flesh on my body <giggle> is to hide my bursting charm. Otherwise, wouldn't it scare you?">The flesh on my body &lt;giggle&gt; is to hide my bursting charm. Otherwise, wouldn't it scare you?</td>
                 <td>
@@ -308,6 +309,40 @@
                 <td>
                     <button onclick="playAudio('data/4022654511881686103_2.wav')">播放</button>
                     <button onclick="playAudio('data/7098819224143199853_2.wav')">播放</button>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="2">second_gen</td>
+                <td>emotion_zero_shot_0</td>
+                <td colspan="2" title="The flesh on my body <giggle> is to hide my bursting charm. Otherwise, wouldn't it scare you?">The flesh on my body &lt;giggle&gt; is to hide my bursting charm. Otherwise, wouldn't it scare you?</td>
+                <td>
+                    <button onclick="playAudio('data/4022654511881686103_3.wav')">播放</button>
+                    <button onclick="playAudio('data/7098819224143199853_3.wav')">播放</button>
+                </td>
+            </tr>
+            <tr>
+                <td>emotion_zero_shot_1</td>
+                <td colspan="2" title="<sigh> You scared me! <cry>">&lt;sigh&gt; You scared me! &lt;cry&gt;</td>
+                <td>
+                    <button onclick="playAudio('data/4022654511881686103_4.wav')">播放</button>
+                    <button onclick="playAudio('data/7098819224143199853_4.wav')">播放</button>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="2">third_gen</td>
+                <td>emotion_zero_shot_0</td>
+                <td colspan="2" title="The flesh on my body <giggle> is to hide my bursting charm. Otherwise, wouldn't it scare you?">The flesh on my body &lt;giggle&gt; is to hide my bursting charm. Otherwise, wouldn't it scare you?</td>
+                <td>
+                    <button onclick="playAudio('data/4022654511881686103_5.wav')">播放</button>
+                    <button onclick="playAudio('data/7098819224143199853_5.wav')">播放</button>
+                </td>
+            </tr>
+            <tr>
+                <td>emotion_zero_shot_1</td>
+                <td colspan="2" title="<sigh> You scared me! <cry>">&lt;sigh&gt; You scared me! &lt;cry&gt;</td>
+                <td>
+                    <button onclick="playAudio('data/4022654511881686103_6.wav')">播放</button>
+                    <button onclick="playAudio('data/7098819224143199853_6.wav')">播放</button>
                 </td>
             </tr>
         </tbody>
